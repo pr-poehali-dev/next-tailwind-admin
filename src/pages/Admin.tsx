@@ -6,7 +6,6 @@ import {
 import Header from '@/components/Header';
 
 const ADMIN_PASSWORD = 'admin123';
-
 type Tab = 'home' | 'rozysk';
 
 export default function Admin() {
@@ -38,7 +37,7 @@ export default function Admin() {
       sessionStorage.setItem('sk_admin_authed', 'true');
       setPasswordError('');
     } else {
-      setPasswordError('Неверный пароль. Попробуйте снова.');
+      setPasswordError('Неверный пароль');
     }
   };
 
@@ -48,24 +47,18 @@ export default function Admin() {
   };
 
   const showSaved = () => {
-    setSaveStatus('✓ Сохранено успешно!');
-    setTimeout(() => setSaveStatus(''), 3000);
+    setSaveStatus('Сохранено!');
+    setTimeout(() => setSaveStatus(''), 2500);
   };
 
   const handleSaveHome = (e: React.FormEvent) => {
     e.preventDefault();
-    if (homeContent) {
-      saveHomeContent(homeContent);
-      showSaved();
-    }
+    if (homeContent) { saveHomeContent(homeContent); showSaved(); }
   };
 
   const handleSaveRozysk = (e: React.FormEvent) => {
     e.preventDefault();
-    if (rozyskContent) {
-      saveRozyskContent(rozyskContent);
-      showSaved();
-    }
+    if (rozyskContent) { saveRozyskContent(rozyskContent); showSaved(); }
   };
 
   const updateNews = (idx: number, field: string, value: string) => {
@@ -77,19 +70,13 @@ export default function Admin() {
 
   const addNews = () => {
     if (!homeContent) return;
-    const newItem = {
-      id: Date.now(),
-      title: 'Новая новость',
-      date: new Date().toLocaleDateString('ru-RU'),
-      text: '',
-    };
+    const newItem = { id: Date.now(), title: 'Новая новость', date: new Date().toLocaleDateString('ru-RU'), text: '' };
     setHomeContent({ ...homeContent, news: [newItem, ...homeContent.news] });
   };
 
   const removeNews = (idx: number) => {
     if (!homeContent) return;
-    const news = homeContent.news.filter((_, i) => i !== idx);
-    setHomeContent({ ...homeContent, news });
+    setHomeContent({ ...homeContent, news: homeContent.news.filter((_, i) => i !== idx) });
   };
 
   const updateSuspect = (idx: number, field: string, value: string) => {
@@ -101,47 +88,47 @@ export default function Admin() {
 
   const addSuspect = () => {
     if (!rozyskContent) return;
-    const newSuspect = { id: Date.now(), name: '', dob: '', description: '', crime: '' };
-    setRozyskContent({ ...rozyskContent, suspects: [...rozyskContent.suspects, newSuspect] });
+    setRozyskContent({ ...rozyskContent, suspects: [...rozyskContent.suspects, { id: Date.now(), name: '', dob: '', description: '', crime: '' }] });
   };
 
   const removeSuspect = (idx: number) => {
     if (!rozyskContent) return;
-    const suspects = rozyskContent.suspects.filter((_, i) => i !== idx);
-    setRozyskContent({ ...rozyskContent, suspects });
+    setRozyskContent({ ...rozyskContent, suspects: rozyskContent.suspects.filter((_, i) => i !== idx) });
   };
+
+  const inputCls = "gov-input";
+  const labelCls = "block text-xs font-semibold mb-1.5";
 
   if (!authed) {
     return (
       <div style={{ backgroundColor: 'var(--gov-bg)', minHeight: '100vh' }}>
         <Header />
-        <div className="max-w-md mx-auto px-4 py-16">
-          <div className="gov-card rounded-sm p-8 shadow-sm">
-            <div className="text-center mb-6">
-              <div className="text-5xl mb-3">🔒</div>
-              <h1 className="text-xl font-bold" style={{ color: 'var(--gov-blue)', fontFamily: 'var(--font-serif)' }}>
-                Панель администратора
+        <div className="max-w-sm mx-auto px-4 py-20">
+          <div className="gov-card p-8">
+            <div className="text-center mb-7">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl"
+                style={{ background: 'var(--gov-blue-pale)' }}>
+                🔒
+              </div>
+              <h1 className="font-bold text-xl mb-1" style={{ color: 'var(--gov-blue)' }}>
+                Панель управления
               </h1>
-              <p className="text-sm mt-1" style={{ color: 'var(--gov-text-muted)' }}>Введите пароль для доступа</p>
+              <p className="text-sm" style={{ color: 'var(--gov-text-muted)' }}>Введите пароль для доступа</p>
             </div>
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold mb-1" style={{ color: 'var(--gov-text)' }}>
-                  Пароль
-                </label>
+                <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Пароль</label>
                 <input
-                  type="password"
-                  value={password}
+                  type="password" value={password} autoFocus
                   onChange={(e) => setPassword(e.target.value)}
-                  autoFocus
-                  className="w-full px-3 py-2 border rounded-sm text-sm outline-none"
-                  style={{ borderColor: passwordError ? 'var(--gov-red)' : 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }}
+                  className={inputCls}
+                  style={{ borderColor: passwordError ? 'var(--gov-red)' : undefined }}
                 />
                 {passwordError && (
-                  <p className="text-xs mt-1" style={{ color: 'var(--gov-red)' }}>{passwordError}</p>
+                  <p className="text-xs mt-1.5 font-medium" style={{ color: 'var(--gov-red)' }}>{passwordError}</p>
                 )}
               </div>
-              <button type="submit" className="gov-btn-primary w-full rounded-sm">
+              <button type="submit" className="gov-btn-primary w-full py-2.5 rounded-lg font-semibold text-sm">
                 Войти
               </button>
             </form>
@@ -156,38 +143,36 @@ export default function Admin() {
       <Header />
       <main className="max-w-4xl mx-auto px-4 py-8">
 
-        {/* Шапка панели */}
+        {/* Шапка */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-bold" style={{ color: 'var(--gov-blue)', fontFamily: 'var(--font-serif)' }}>
-              🛠 Панель управления контентом
+            <h1 className="font-bold text-xl" style={{ color: 'var(--gov-blue)' }}>
+              Управление контентом
             </h1>
             <p className="text-xs mt-0.5" style={{ color: 'var(--gov-text-muted)' }}>
-              Изменения сохраняются локально и отображаются сразу на сайте
+              Изменения сохраняются в браузере и сразу отображаются на сайте
             </p>
           </div>
-          <button onClick={handleLogout} className="text-xs px-3 py-1.5 border rounded-sm hover:bg-gray-100"
-            style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text-muted)' }}>
-            Выйти
-          </button>
+          <div className="flex items-center gap-3">
+            {saveStatus && (
+              <span className="text-xs font-semibold px-3 py-1.5 rounded-full"
+                style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #86efac' }}>
+                ✓ {saveStatus}
+              </span>
+            )}
+            <button onClick={handleLogout}
+              className="text-xs px-3 py-2 rounded-lg border font-medium hover:bg-gray-50"
+              style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text-muted)' }}>
+              Выйти
+            </button>
+          </div>
         </div>
 
-        {/* Статус сохранения */}
-        {saveStatus && (
-          <div className="mb-4 px-4 py-3 rounded-sm text-sm font-bold"
-            style={{ background: '#f0fff0', border: '1px solid #90c090', color: '#006400' }}>
-            {saveStatus}
-          </div>
-        )}
-
         {/* Табы */}
-        <div className="flex gap-1 mb-6">
+        <div className="flex gap-1 mb-0 border-b" style={{ borderColor: 'var(--gov-border)' }}>
           {(['home', 'rozysk'] as Tab[]).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-5 py-2 text-sm font-bold rounded-t-sm transition-colors ${activeTab === tab ? 'tab-active' : 'tab-inactive'}`}
-            >
+            <button key={tab} onClick={() => setActiveTab(tab)}
+              className={`px-5 py-2.5 text-sm font-semibold transition-all ${activeTab === tab ? 'tab-active' : 'tab-inactive'}`}>
               {tab === 'home' ? '📋 Главная страница' : '⚠ Страница розыска'}
             </button>
           ))}
@@ -195,224 +180,193 @@ export default function Admin() {
 
         {/* Редактор Главной */}
         {activeTab === 'home' && homeContent && (
-          <form onSubmit={handleSaveHome} className="space-y-6">
+          <form onSubmit={handleSaveHome} className="space-y-5 pt-6">
 
-            {/* Шапка */}
-            <div className="gov-card rounded-sm p-5 shadow-sm">
-              <h2 className="font-bold text-base mb-4" style={{ color: 'var(--gov-blue)', fontFamily: 'var(--font-serif)' }}>
+            <div className="gov-card p-5">
+              <h2 className="font-bold text-sm mb-4 flex items-center gap-2"
+                style={{ color: 'var(--gov-blue)' }}>
+                <span className="w-1 h-4 rounded-full inline-block" style={{ background: 'var(--gov-blue)' }} />
                 Заголовки страницы
               </h2>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold mb-1">Основной заголовок</label>
-                  <input type="text" value={homeContent.title}
-                    onChange={(e) => setHomeContent({ ...homeContent, title: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-sm text-sm"
-                    style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                  <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Основной заголовок</label>
+                  <input type="text" value={homeContent.title} className={inputCls}
+                    onChange={(e) => setHomeContent({ ...homeContent, title: e.target.value })} />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1">Подзаголовок</label>
-                  <input type="text" value={homeContent.subtitle}
-                    onChange={(e) => setHomeContent({ ...homeContent, subtitle: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-sm text-sm"
-                    style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                  <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Подзаголовок</label>
+                  <input type="text" value={homeContent.subtitle} className={inputCls}
+                    onChange={(e) => setHomeContent({ ...homeContent, subtitle: e.target.value })} />
                 </div>
               </div>
             </div>
 
-            {/* Контакты */}
-            <div className="gov-card rounded-sm p-5 shadow-sm">
-              <h2 className="font-bold text-base mb-4" style={{ color: 'var(--gov-blue)', fontFamily: 'var(--font-serif)' }}>
+            <div className="gov-card p-5">
+              <h2 className="font-bold text-sm mb-4 flex items-center gap-2"
+                style={{ color: 'var(--gov-blue)' }}>
+                <span className="w-1 h-4 rounded-full inline-block" style={{ background: 'var(--gov-blue)' }} />
                 Контактная информация
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {(['address', 'phone', 'email', 'schedule'] as const).map((field) => (
                   <div key={field}>
-                    <label className="block text-xs font-bold mb-1 capitalize">
+                    <label className={labelCls} style={{ color: 'var(--gov-text)' }}>
                       {field === 'address' ? 'Адрес' : field === 'phone' ? 'Телефон' : field === 'email' ? 'Email' : 'Режим работы'}
                     </label>
-                    <input type="text" value={homeContent.contact[field]}
-                      onChange={(e) => setHomeContent({ ...homeContent, contact: { ...homeContent.contact, [field]: e.target.value } })}
-                      className="w-full px-3 py-2 border rounded-sm text-sm"
-                      style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                    <input type="text" value={homeContent.contact[field]} className={inputCls}
+                      onChange={(e) => setHomeContent({ ...homeContent, contact: { ...homeContent.contact, [field]: e.target.value } })} />
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Руководство */}
-            <div className="gov-card rounded-sm p-5 shadow-sm">
-              <h2 className="font-bold text-base mb-4" style={{ color: 'var(--gov-blue)', fontFamily: 'var(--font-serif)' }}>
-                Информация о руководителе
+            <div className="gov-card p-5">
+              <h2 className="font-bold text-sm mb-4 flex items-center gap-2"
+                style={{ color: 'var(--gov-blue)' }}>
+                <span className="w-1 h-4 rounded-full inline-block" style={{ background: 'var(--gov-blue)' }} />
+                Руководитель
               </h2>
               <div className="space-y-3">
                 {(['name', 'rank', 'bio'] as const).map((field) => (
                   <div key={field}>
-                    <label className="block text-xs font-bold mb-1">
+                    <label className={labelCls} style={{ color: 'var(--gov-text)' }}>
                       {field === 'name' ? 'ФИО' : field === 'rank' ? 'Звание / должность' : 'Биография'}
                     </label>
                     {field === 'bio' ? (
-                      <textarea rows={3} value={homeContent.chief[field]}
-                        onChange={(e) => setHomeContent({ ...homeContent, chief: { ...homeContent.chief, [field]: e.target.value } })}
-                        className="w-full px-3 py-2 border rounded-sm text-sm resize-none"
-                        style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                      <textarea rows={2} value={homeContent.chief[field]} className={`${inputCls} resize-none`}
+                        onChange={(e) => setHomeContent({ ...homeContent, chief: { ...homeContent.chief, [field]: e.target.value } })} />
                     ) : (
-                      <input type="text" value={homeContent.chief[field]}
-                        onChange={(e) => setHomeContent({ ...homeContent, chief: { ...homeContent.chief, [field]: e.target.value } })}
-                        className="w-full px-3 py-2 border rounded-sm text-sm"
-                        style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                      <input type="text" value={homeContent.chief[field]} className={inputCls}
+                        onChange={(e) => setHomeContent({ ...homeContent, chief: { ...homeContent.chief, [field]: e.target.value } })} />
                     )}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Новости */}
-            <div className="gov-card rounded-sm p-5 shadow-sm">
+            <div className="gov-card p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-bold text-base" style={{ color: 'var(--gov-blue)', fontFamily: 'var(--font-serif)' }}>
+                <h2 className="font-bold text-sm flex items-center gap-2"
+                  style={{ color: 'var(--gov-blue)' }}>
+                  <span className="w-1 h-4 rounded-full inline-block" style={{ background: 'var(--gov-blue)' }} />
                   Новости ({homeContent.news.length})
                 </h2>
-                <button type="button" onClick={addNews} className="gov-btn-primary text-sm rounded-sm px-3 py-1.5">
-                  + Добавить новость
+                <button type="button" onClick={addNews} className="gov-btn-primary text-xs px-3 py-1.5 rounded-lg">
+                  + Добавить
                 </button>
               </div>
               <div className="space-y-4">
                 {homeContent.news.map((item, idx) => (
-                  <div key={item.id} className="p-4 rounded-sm" style={{ background: '#f8f7f4', border: '1px solid var(--gov-border)' }}>
+                  <div key={item.id} className="p-4 rounded-xl" style={{ background: 'var(--gov-surface2)', border: '1px solid var(--gov-border)' }}>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold px-2 py-0.5 rounded"
-                        style={{ backgroundColor: 'var(--gov-blue)', color: 'white' }}>
-                        #{idx + 1}
-                      </span>
+                      <span className="badge-blue">#{idx + 1}</span>
                       <button type="button" onClick={() => removeNews(idx)}
-                        className="text-xs px-2 py-1 rounded hover:bg-red-100"
-                        style={{ color: 'var(--gov-red)' }}>
-                        ✕ Удалить
+                        className="text-xs font-medium hover:underline" style={{ color: 'var(--gov-red)' }}>
+                        Удалить
                       </button>
                     </div>
                     <div className="grid grid-cols-3 gap-2 mb-2">
                       <div className="col-span-2">
-                        <label className="block text-xs font-bold mb-1">Заголовок</label>
-                        <input type="text" value={item.title}
-                          onChange={(e) => updateNews(idx, 'title', e.target.value)}
-                          className="w-full px-3 py-2 border rounded-sm text-sm"
-                          style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                        <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Заголовок</label>
+                        <input type="text" value={item.title} className={inputCls}
+                          onChange={(e) => updateNews(idx, 'title', e.target.value)} />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold mb-1">Дата</label>
-                        <input type="text" value={item.date}
-                          onChange={(e) => updateNews(idx, 'date', e.target.value)}
-                          className="w-full px-3 py-2 border rounded-sm text-sm"
-                          style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                        <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Дата</label>
+                        <input type="text" value={item.date} className={inputCls}
+                          onChange={(e) => updateNews(idx, 'date', e.target.value)} />
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold mb-1">Текст новости</label>
-                      <textarea rows={2} value={item.text}
-                        onChange={(e) => updateNews(idx, 'text', e.target.value)}
-                        className="w-full px-3 py-2 border rounded-sm text-sm resize-none"
-                        style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }} />
-                    </div>
+                    <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Текст</label>
+                    <textarea rows={2} value={item.text} className={`${inputCls} resize-none`}
+                      onChange={(e) => updateNews(idx, 'text', e.target.value)} />
                   </div>
                 ))}
               </div>
             </div>
 
-            <button type="submit" className="gov-btn-primary w-full py-3 text-base rounded-sm">
-              💾 Сохранить изменения главной страницы
+            <button type="submit" className="gov-btn-primary w-full py-3 rounded-xl font-semibold">
+              Сохранить главную страницу
             </button>
           </form>
         )}
 
         {/* Редактор Розыска */}
         {activeTab === 'rozysk' && rozyskContent && (
-          <form onSubmit={handleSaveRozysk} className="space-y-6">
+          <form onSubmit={handleSaveRozysk} className="space-y-5 pt-6">
 
-            <div className="gov-card rounded-sm p-5 shadow-sm">
-              <h2 className="font-bold text-base mb-4" style={{ color: 'var(--gov-blue)', fontFamily: 'var(--font-serif)' }}>
+            <div className="gov-card p-5">
+              <h2 className="font-bold text-sm mb-4 flex items-center gap-2"
+                style={{ color: 'var(--gov-blue)' }}>
+                <span className="w-1 h-4 rounded-full inline-block" style={{ background: 'var(--gov-red)' }} />
                 Основные тексты
               </h2>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold mb-1">Заголовок страницы</label>
-                  <input type="text" value={rozyskContent.title}
-                    onChange={(e) => setRozyskContent({ ...rozyskContent, title: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-sm text-sm"
-                    style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                  <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Заголовок</label>
+                  <input type="text" value={rozyskContent.title} className={inputCls}
+                    onChange={(e) => setRozyskContent({ ...rozyskContent, title: e.target.value })} />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1">Описание / предупреждение</label>
-                  <textarea rows={4} value={rozyskContent.description}
-                    onChange={(e) => setRozyskContent({ ...rozyskContent, description: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-sm text-sm resize-none"
-                    style={{ borderColor: 'var(--gov-border)', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                  <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Описание</label>
+                  <textarea rows={3} value={rozyskContent.description} className={`${inputCls} resize-none`}
+                    onChange={(e) => setRozyskContent({ ...rozyskContent, description: e.target.value })} />
                 </div>
               </div>
             </div>
 
-            <div className="gov-card rounded-sm p-5 shadow-sm">
+            <div className="gov-card p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-bold text-base" style={{ color: 'var(--gov-blue)', fontFamily: 'var(--font-serif)' }}>
+                <h2 className="font-bold text-sm flex items-center gap-2"
+                  style={{ color: 'var(--gov-blue)' }}>
+                  <span className="w-1 h-4 rounded-full inline-block" style={{ background: 'var(--gov-red)' }} />
                   Разыскиваемые лица ({rozyskContent.suspects.length})
                 </h2>
-                <button type="button" onClick={addSuspect} className="gov-btn-red text-sm rounded-sm px-3 py-1.5">
+                <button type="button" onClick={addSuspect} className="gov-btn-red text-xs px-3 py-1.5 rounded-lg">
                   + Добавить
                 </button>
               </div>
               <div className="space-y-4">
                 {rozyskContent.suspects.map((suspect, idx) => (
-                  <div key={suspect.id} className="p-4 rounded-sm"
-                    style={{ background: '#fff8f8', border: '1px solid #fdd' }}>
+                  <div key={suspect.id} className="p-4 rounded-xl"
+                    style={{ background: '#fff8f8', border: '1px solid #fecaca' }}>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold px-2 py-0.5 rounded"
-                        style={{ backgroundColor: 'var(--gov-red)', color: 'white' }}>
-                        Лицо №{idx + 1}
-                      </span>
+                      <span className="badge-red">Лицо №{idx + 1}</span>
                       <button type="button" onClick={() => removeSuspect(idx)}
-                        className="text-xs px-2 py-1 rounded hover:bg-red-100"
-                        style={{ color: 'var(--gov-red)' }}>
-                        ✕ Удалить
+                        className="text-xs font-medium hover:underline" style={{ color: 'var(--gov-red)' }}>
+                        Удалить
                       </button>
                     </div>
                     <div className="grid grid-cols-2 gap-2 mb-2">
                       <div>
-                        <label className="block text-xs font-bold mb-1">ФИО</label>
-                        <input type="text" value={suspect.name}
-                          onChange={(e) => updateSuspect(idx, 'name', e.target.value)}
-                          className="w-full px-3 py-2 border rounded-sm text-sm"
-                          style={{ borderColor: '#fdd', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                        <label className={labelCls} style={{ color: 'var(--gov-text)' }}>ФИО</label>
+                        <input type="text" value={suspect.name} className={inputCls}
+                          onChange={(e) => updateSuspect(idx, 'name', e.target.value)} />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold mb-1">Дата рождения</label>
-                        <input type="text" value={suspect.dob}
-                          onChange={(e) => updateSuspect(idx, 'dob', e.target.value)}
-                          placeholder="ДД.ММ.ГГГГ"
-                          className="w-full px-3 py-2 border rounded-sm text-sm"
-                          style={{ borderColor: '#fdd', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                        <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Дата рождения</label>
+                        <input type="text" value={suspect.dob} placeholder="ДД.ММ.ГГГГ" className={inputCls}
+                          onChange={(e) => updateSuspect(idx, 'dob', e.target.value)} />
                       </div>
                     </div>
                     <div className="mb-2">
-                      <label className="block text-xs font-bold mb-1">Внешность / описание</label>
-                      <textarea rows={2} value={suspect.description}
-                        onChange={(e) => updateSuspect(idx, 'description', e.target.value)}
-                        className="w-full px-3 py-2 border rounded-sm text-sm resize-none"
-                        style={{ borderColor: '#fdd', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                      <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Описание внешности</label>
+                      <textarea rows={2} value={suspect.description} className={`${inputCls} resize-none`}
+                        onChange={(e) => updateSuspect(idx, 'description', e.target.value)} />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold mb-1">Статья / преступление</label>
-                      <input type="text" value={suspect.crime}
-                        onChange={(e) => updateSuspect(idx, 'crime', e.target.value)}
-                        className="w-full px-3 py-2 border rounded-sm text-sm"
-                        style={{ borderColor: '#fdd', color: 'var(--gov-text)', backgroundColor: 'white' }} />
+                      <label className={labelCls} style={{ color: 'var(--gov-text)' }}>Статья / преступление</label>
+                      <input type="text" value={suspect.crime} className={inputCls}
+                        onChange={(e) => updateSuspect(idx, 'crime', e.target.value)} />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <button type="submit" className="gov-btn-red w-full py-3 text-base rounded-sm">
-              💾 Сохранить изменения страницы розыска
+            <button type="submit" className="gov-btn-red w-full py-3 rounded-xl font-semibold">
+              Сохранить страницу розыска
             </button>
           </form>
         )}
